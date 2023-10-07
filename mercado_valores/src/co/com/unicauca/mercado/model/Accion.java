@@ -74,4 +74,9 @@ public class Accion extends Observable {
         this.setChanged();
         this.notifyObservers(this);
     }
+
+    @Override
+    public String toString() {
+        return this.nombre;
+    }
 }
