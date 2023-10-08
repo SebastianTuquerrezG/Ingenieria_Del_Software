@@ -89,8 +89,9 @@ public class ControlDeVistaDeMercado extends JFrame {
         JButton addButton = new JButton("Agregar Acción");
         addButton.addActionListener(e -> {
             //validar que los campos no esten vacios
-            if(nameField.getText().isEmpty() || initialPriceField.getText().isEmpty() ||
-                    lowerThresholdField.getText().isEmpty() || upperThresholdField.getText().isEmpty()){
+            if(nameField.getText().isEmpty()// || initialPriceField.getText().isEmpty() ||
+                    //lowerThresholdField.getText().isEmpty() || upperThresholdField.getText().isEmpty())
+            ){
                 JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios");
                 return;
             }

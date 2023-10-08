@@ -1,13 +1,9 @@
 package co.com.unicauca.pago.view;
 
-import co.com.unicauca.pago.controller.ClienteController;
-import co.com.unicauca.pago.controller.TransaccionController;
 import co.com.unicauca.pago.modelo.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Objects;
 
 public class ControlVistaPrincipal extends JFrame {
