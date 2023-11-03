@@ -2,7 +2,9 @@ package co.edu.enterprisetest.enterprise.controller;
 
 import co.edu.enterprisetest.enterprise.model.Customers;
 import co.edu.enterprisetest.enterprise.repository.CustomersRepository;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
@@ -86,21 +88,88 @@ public class CustomersController {
     }
 
     @PostMapping
-    public Customers createCustomer(@RequestBody Customers customer) {
-        return customersRepository.save(customer);
+    public String createCustomer(@RequestBody @NotNull Customers customer) {
+        try (Connection connection = dataSource.getConnection()) {
+            String query = "INSERT INTO customers (customerNumber, customerName, contactLastName, contactFirstName, phone, addressLine1, addressLine2, city, state, postalCode, country, salesRepEmployeeNumber, creditLimit) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, customer.getCustomerNumber());
+                preparedStatement.setString(2, customer.getCustomerName());
+                preparedStatement.setString(3, customer.getContactLastName());
+                preparedStatement.setString(4, customer.getContactFirstName());
+                preparedStatement.setString(5, customer.getPhone());
+                preparedStatement.setString(6, customer.getAddressLine1());
+                preparedStatement.setString(7, customer.getAddressLine2());
+                preparedStatement.setString(8, customer.getCity());
+                preparedStatement.setString(9, customer.getState());
+                preparedStatement.setString(10, customer.getPostalCode());
+                preparedStatement.setString(11, customer.getCountry());
+                preparedStatement.setInt(12, customer.getSalesRepEmployeeNumber());
+                preparedStatement.setDouble(13, customer.getCreditLimit());
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    return "Customer created successfully.";
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return "Failed to create customer.";
     }
 
     @PutMapping("/{id}")
-    public Customers updateCustomer(@PathVariable int id, @RequestBody Customers customer) {
-        if (customersRepository.existsById(String.valueOf(id))) {
-            customer.setCustomerNumber(id);
-            return customersRepository.save(customer);
+    public String updateCustomer(@PathVariable int id, @RequestBody @NotNull Customers customer) {
+        try (Connection connection = dataSource.getConnection()) {
+            String query = "UPDATE customers " +
+                    "SET customerNumber = ?, customerName = ?, contactLastName = ?, contactFirstName = ?, phone = ?, addressLine1 = ?, " +
+                    "addressLine2 = ?, city = ?, state = ?, postalCode = ?, country = ?, salesRepEmployeeNumber = ?, creditLimit = ? " +
+                    "WHERE customerNumber = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, customer.getCustomerNumber());
+                preparedStatement.setString(2, customer.getCustomerName());
+                preparedStatement.setString(3, customer.getContactLastName());
+                preparedStatement.setString(4, customer.getContactFirstName());
+                preparedStatement.setString(5, customer.getPhone());
+                preparedStatement.setString(6, customer.getAddressLine1());
+                preparedStatement.setString(7, customer.getAddressLine2());
+                preparedStatement.setString(8, customer.getCity());
+                preparedStatement.setString(9, customer.getState());
+                preparedStatement.setString(10, customer.getPostalCode());
+                preparedStatement.setString(11, customer.getCountry());
+                preparedStatement.setInt(12, customer.getSalesRepEmployeeNumber());
+                preparedStatement.setDouble(13, customer.getCreditLimit());
+                preparedStatement.setInt(14, id);
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    return "Customer updated successfully.";
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return null;
+
+        return "Failed to update customer.";
     }
 
     @DeleteMapping("/{id}")
-    public void deleteCustomer(@PathVariable int id) {
-        customersRepository.deleteById(String.valueOf(id));
+    public String deleteCustomer(@PathVariable int id) {
+        try (Connection connection = dataSource.getConnection()) {
+            String query = "DELETE FROM customers WHERE customerNumber = ?";
+            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+                preparedStatement.setInt(1, id);
+
+                int rowsAffected = preparedStatement.executeUpdate();
+                if (rowsAffected > 0) {
+                    return "Customer deleted successfully.";
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return "Failed to delete customer.";
     }
 }
