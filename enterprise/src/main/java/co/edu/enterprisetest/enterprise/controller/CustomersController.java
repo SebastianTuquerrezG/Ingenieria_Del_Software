@@ -1,16 +1,13 @@
 package co.edu.enterprisetest.enterprise.controller;
 
 import co.edu.enterprisetest.enterprise.model.Customers;
-import co.edu.enterprisetest.enterprise.repository.CustomersRepository;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;;
 
 @RestController
@@ -18,9 +15,6 @@ import java.util.List;;
 public class CustomersController {
     @Autowired
     private DataSource dataSource;
-
-    @Autowired
-    private CustomersRepository customersRepository;
 
     @GetMapping
     public List<Customers> getCustomers() {
@@ -59,7 +53,8 @@ public class CustomersController {
         Customers customer = new Customers();
 
         try(Connection connection = dataSource.getConnection()) {
-            try (PreparedStatement statement = connection.prepareStatement("SELECT * FROM customers WHERE customerNumber = ?")) {
+            String query = "SELECT * FROM customers WHERE customerNumber = ?";
+            try (PreparedStatement statement = connection.prepareStatement(query)) {
                 statement.setInt(1, id);
                 try (ResultSet resultSet = statement.executeQuery()){
                     if (resultSet.next()) {
@@ -90,7 +85,9 @@ public class CustomersController {
     @PostMapping
     public String createCustomer(@RequestBody @NotNull Customers customer) {
         try (Connection connection = dataSource.getConnection()) {
-            String query = "INSERT INTO customers (customerNumber, customerName, contactLastName, contactFirstName, phone, addressLine1, addressLine2, city, state, postalCode, country, salesRepEmployeeNumber, creditLimit) " +
+            String query = "INSERT INTO customers (customerNumber, customerName," +
+                    " contactLastName, contactFirstName, phone, addressLine1, addressLine2," +
+                    " city, state, postalCode, country, salesRepEmployeeNumber, creditLimit) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
             try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
                 preparedStatement.setInt(1, customer.getCustomerNumber());
